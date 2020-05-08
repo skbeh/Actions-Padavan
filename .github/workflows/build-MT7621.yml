@@ -59,7 +59,7 @@ jobs:
         fi
         CONFIG=configs/templates/$m.config
         echo "CONFIG_FIRMWARE_INCLUDE_IPERF3=y" >> $CONFIG
-        echo "CONFIG_FIRMWARE_CPU_SLEEP=y" >> $CONFIG
+        #echo "CONFIG_FIRMWARE_CPU_SLEEP=y" >> $CONFIG
         sed -i "s/^CONFIG_TOOLCHAIN_DIR=.*$/CONFIG_TOOLCHAIN_DIR=${CONFIG_TOOLCHAIN_DIR}/g" $CONFIG
         ./clear_tree
         fakeroot ./build_firmware_modify $m
