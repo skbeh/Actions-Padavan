@@ -3,7 +3,7 @@ name: Build MT7621
 on: 
   release:
     types: [published]
-#  push:
+  push:
 #    tags:
 #    - 'v*'
   #  branches: 
