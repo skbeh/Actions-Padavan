@@ -74,7 +74,7 @@ jobs:
         file_glob: true
     - uses: ncipollo/release-action@v1.6.1
       with:
-       bodyFile: "rt-n56u/changelog.md"
+       #bodyFile: "rt-n56u/changelog.md"
        tag: AutoBuild
        allowUpdates: true
        name: Padavan-firmware
