@@ -52,8 +52,9 @@ jobs:
         cwd=`pwd`
         CONFIG_TOOLCHAIN_DIR=${cwd//\//\\\/}\\/toolchain-mipsel
         cd trunk
-        for m in $DEVICE_NAME;
-        do
+        #for m in $DEVICE_NAME;
+        #do
+        m=$DEVICE_NAME
         if [ ! -f configs/templates/$m.config ] ; then
         echo "configs/templates/$m.config not found "
         exit 1
@@ -71,7 +72,7 @@ jobs:
         fakeroot ./build_firmware_modify $m
         mkdir -p ${{ env.FIRMWARE }}
         mv -f images/*.trx ${{ env.FIRMWARE }}
-        done
+        #done
     - name: Upload binaries to release
       uses: svenstaro/upload-release-action@v2
       with:
