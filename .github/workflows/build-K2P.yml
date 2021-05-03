@@ -1,4 +1,4 @@
-name: Build MT7621
+name: Build K2P
 
 on: 
   release:
@@ -28,16 +28,16 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v2.1.0
+      uses: actions/checkout@v2
     - name: Initialization environment
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
         sudo apt-get update
-        sudo apt install unzip libtool-bin curl cmake gperf gawk flex bison nano xxd fakeroot \
-        cpio git python-docutils gettext automake autopoint texinfo build-essential help2man \
-        pkg-config zlib1g-dev libgmp3-dev libmpc-dev libmpfr-dev libncurses5-dev libltdl-dev wget
-    - name: Clone source code
+        sudo apt install unzip libtool-bin curl cmake gperf gawk flex bison nano xxd \
+	fakeroot kmod cpio git python3-docutils gettext automake autopoint \
+	texinfo build-essential help2man pkg-config zlib1g-dev libgmp3-dev \
+	libmpc-dev libmpfr-dev libncurses5-dev libltdl-dev wget libc-dev-bin
       run: |
         git clone --depth 1 $REPO_URL -b $REPO_BRANCH rt-n56u
         cd rt-n56u/toolchain-mipsel
@@ -45,7 +45,7 @@ jobs:
         ./build_toolchain
     - name: Build Firmware
       env:
-        DEVICE_NAME: "K2P_nano-5.0"
+        DEVICE_NAME: "K2P_nano"
       run: |
         cd rt-n56u
         cwd=`pwd`
@@ -66,14 +66,14 @@ jobs:
         mv -f images/*.trx ${{ env.FIRMWARE }}
         done
     - name: Upload binaries to release
-      uses: svenstaro/upload-release-action@v1-release
+      uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: /opt/images/*.trx
         tag: AutoBuild
         overwrite: true
         file_glob: true
-    - uses: ncipollo/release-action@v1.6.1
+    - uses: ncipollo/release-action@v1
       with:
        #bodyFile: "rt-n56u/changelog.md"
        tag: AutoBuild
@@ -83,7 +83,7 @@ jobs:
        draft: true
 
     - name: Upload firmware directory
-      uses: actions/upload-artifact@master
+      uses: actions/upload-artifact@v2
       if: steps.organize.outputs.status == 'success' && !cancelled()
       with:
         name: Padavan_firmware${{ env.DEVICE_NAME }}
