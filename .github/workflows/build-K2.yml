@@ -52,7 +52,7 @@ jobs:
         cwd=`pwd`
         CONFIG_TOOLCHAIN_DIR=${cwd//\//\\\/}\\/toolchain-mipsel
         cd trunk
-        m=$(DEVICE_NAME)
+        m=${DEVICE_NAME}
         if [ ! -f configs/templates/$m.config ] ; then
         echo "configs/templates/$m.config not found "
         exit 1
