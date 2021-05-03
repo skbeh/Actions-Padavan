@@ -38,6 +38,7 @@ jobs:
         fakeroot kmod cpio git python3-docutils gettext automake autopoint \
         texinfo build-essential help2man pkg-config zlib1g-dev libgmp3-dev \
         libmpc-dev libmpfr-dev libncurses5-dev libltdl-dev wget libc-dev-bin
+    - name: Clone source code
       run: |
         git clone --depth 1 $REPO_URL -b $REPO_BRANCH rt-n56u
         cd rt-n56u/toolchain-mipsel
