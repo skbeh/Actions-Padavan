@@ -1,0 +1,97 @@
+name: Build MT7621
+
+on: 
+  release:
+    types: [published]
+  push:
+#    tags:
+#    - 'v*'
+  #  branches: 
+  #    - master
+  schedule:
+    - cron: 0 16 * * *
+#  watch:
+#   types: [started]
+
+env:
+  REPO_URL: https://github.com/hanwckf/rt-n56u
+  REPO_BRANCH: master
+  UPLOAD_FIRMWARE: true
+  UPLOAD_COWTRANSFER: true
+  TZ: Asia/Shanghai
+  FIRMWARE: /opt/images
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: github.event.repository.owner.id == github.event.sender.id
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2.1.0
+    - name: Initialization environment
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        sudo apt-get update
+        sudo apt install unzip libtool-bin curl cmake gperf gawk flex bison nano xxd fakeroot \
+        cpio git python-docutils gettext automake autopoint texinfo build-essential help2man \
+        pkg-config zlib1g-dev libgmp3-dev libmpc-dev libmpfr-dev libncurses5-dev libltdl-dev wget
+    - name: Clone source code
+      run: |
+        git clone --depth 1 $REPO_URL -b $REPO_BRANCH rt-n56u
+        cd rt-n56u/toolchain-mipsel
+        ./clean_toolchain
+        ./build_toolchain
+    - name: Build Firmware
+      env:
+        DEVICE_NAME: "K2P_nano-5.0"
+      run: |
+        cd rt-n56u
+        cwd=`pwd`
+        CONFIG_TOOLCHAIN_DIR=${cwd//\//\\\/}\\/toolchain-mipsel
+        cd trunk
+        for m in $DEVICE_NAME;
+        do
+        if [ ! -f configs/templates/$m.config ] ; then
+        echo "configs/templates/$m.config not found "
+        exit 1
+        fi
+        CONFIG=configs/templates/$m.config
+        echo "CONFIG_FIRMWARE_INCLUDE_IPERF3=y" >> $CONFIG
+        sed -i "s/^CONFIG_TOOLCHAIN_DIR=.*$/CONFIG_TOOLCHAIN_DIR=${CONFIG_TOOLCHAIN_DIR}/g" $CONFIG
+        ./clear_tree
+        fakeroot ./build_firmware_modify $m
+        mkdir -p ${{ env.FIRMWARE }}
+        mv -f images/*.trx ${{ env.FIRMWARE }}
+        done
+    - name: Upload binaries to release
+      uses: svenstaro/upload-release-action@v1-release
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: /opt/images/*.trx
+        tag: AutoBuild
+        overwrite: true
+        file_glob: true
+    - uses: ncipollo/release-action@v1.6.1
+      with:
+       #bodyFile: "rt-n56u/changelog.md"
+       tag: AutoBuild
+       allowUpdates: true
+       name: Padavan-firmware
+       token: ${{ secrets.GITHUB_TOKEN }}
+       draft: true
+
+    - name: Upload firmware directory
+      uses: actions/upload-artifact@master
+      if: steps.organize.outputs.status == 'success' && !cancelled()
+      with:
+        name: Padavan_firmware${{ env.DEVICE_NAME }}
+        path: ${{ env.FIRMWARE }}
+
+    - name: Upload firmware to cowtransfer
+      if: steps.organize.outputs.status == 'success' && env.UPLOAD_COWTRANSFER == 'true' && !cancelled()
+      run: |
+        curl -fsSL git.io/file-transfer | sh
+        ./transfer cow --block 2621440 -s -p 64 --no-progress ${FIRMWARE} 2>&1 | tee cowtransfer.log
+        echo "::warning file=cowtransfer.com::$(cat cowtransfer.log | grep https)"
