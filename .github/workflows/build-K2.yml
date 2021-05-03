@@ -59,7 +59,12 @@ jobs:
         exit 1
         fi
         CONFIG=configs/templates/$m.config
-        #echo "CONFIG_FIRMWARE_INCLUDE_IPERF3=y" >> $CONFIG
+        echo "CONFIG_FIRMWARE_INCLUDE_IPSET=n" >> $CONFIG
+        echo "CONFIG_FIRMWARE_INCLUDE_SMBD36=n" >> $CONFIG
+        echo "CONFIG_FIRMWARE_INCLUDE_EAP_PEAP=n" >> $CONFIG
+        echo "CONFIG_FIRMWARE_INCLUDE_XUPNPD=n" >> $CONFIG
+        echo "CONFIG_FIRMWARE_INCLUDE_DOGCOM=n" >> $CONFIG
+        echo "CONFIG_FIRMWARE_INCLUDE_MINIEAP=n" >> $CONFIG
         sed -i "s/^CONFIG_TOOLCHAIN_DIR=.*$/CONFIG_TOOLCHAIN_DIR=${CONFIG_TOOLCHAIN_DIR}/g" $CONFIG
         ./clear_tree
         fakeroot ./build_firmware_modify $m
