@@ -46,7 +46,7 @@ jobs:
         ./build_toolchain
     - name: Build Firmware
       env:
-        DEVICE_NAME: "PSG1218_nano"
+        DEVICE_NAME: PSG1218_nano
       run: |
         cd rt-n56u
         cwd=`pwd`
