@@ -34,9 +34,10 @@ jobs:
         DEBIAN_FRONTEND: noninteractive
       run: |
         sudo apt-get update
-        sudo apt install unzip libtool-bin curl cmake gperf gawk flex bison nano xxd fakeroot \
-        cpio git python-docutils gettext automake autopoint texinfo build-essential help2man \
-        pkg-config zlib1g-dev libgmp3-dev libmpc-dev libmpfr-dev libncurses5-dev libltdl-dev wget
+        sudo apt install unzip libtool-bin curl cmake gperf gawk flex bison nano xxd \
+        fakeroot kmod cpio git python3-docutils gettext automake autopoint \
+        texinfo build-essential help2man pkg-config zlib1g-dev libgmp3-dev \
+        libmpc-dev libmpfr-dev libncurses5-dev libltdl-dev wget libc-dev-bin
     - name: Clone source code
       run: |
         git clone --depth 1 $REPO_URL -b $REPO_BRANCH rt-n56u
@@ -45,7 +46,7 @@ jobs:
         ./build_toolchain
     - name: Build Firmware
       env:
-        DEVICE_NAME: "PSG1218"
+        DEVICE_NAME: "PSG1218_nano"
       run: |
         cd rt-n56u
         cwd=`pwd`
@@ -58,7 +59,7 @@ jobs:
         exit 1
         fi
         CONFIG=configs/templates/$m.config
-        echo "CONFIG_FIRMWARE_INCLUDE_IPERF3=y" >> $CONFIG
+        #echo "CONFIG_FIRMWARE_INCLUDE_IPERF3=y" >> $CONFIG
         sed -i "s/^CONFIG_TOOLCHAIN_DIR=.*$/CONFIG_TOOLCHAIN_DIR=${CONFIG_TOOLCHAIN_DIR}/g" $CONFIG
         ./clear_tree
         fakeroot ./build_firmware_modify $m
@@ -75,7 +76,6 @@ jobs:
         file_glob: true
     - uses: ncipollo/release-action@v1
       with:
-       #bodyFile: "rt-n56u/changelog.md"
        tag: AutoBuild
        allowUpdates: true
        name: Padavan-firmware
