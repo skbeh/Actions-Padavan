@@ -1,4 +1,4 @@
-name: Build MT7621
+name: Build K2
 
 on: 
   release:
@@ -28,7 +28,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v2.1.0
+      uses: actions/checkout@v2
     - name: Initialization environment
       env:
         DEBIAN_FRONTEND: noninteractive
@@ -45,7 +45,7 @@ jobs:
         ./build_toolchain
     - name: Build Firmware
       env:
-        DEVICE_NAME: "K2P_nano-5.0"
+        DEVICE_NAME: "PSG1218"
       run: |
         cd rt-n56u
         cwd=`pwd`
@@ -66,14 +66,14 @@ jobs:
         mv -f images/*.trx ${{ env.FIRMWARE }}
         done
     - name: Upload binaries to release
-      uses: svenstaro/upload-release-action@v1-release
+      uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: /opt/images/*.trx
         tag: AutoBuild
         overwrite: true
         file_glob: true
-    - uses: ncipollo/release-action@v1.6.1
+    - uses: ncipollo/release-action@v1
       with:
        #bodyFile: "rt-n56u/changelog.md"
        tag: AutoBuild
@@ -83,7 +83,7 @@ jobs:
        draft: true
 
     - name: Upload firmware directory
-      uses: actions/upload-artifact@master
+      uses: actions/upload-artifact@v2
       if: steps.organize.outputs.status == 'success' && !cancelled()
       with:
         name: Padavan_firmware${{ env.DEVICE_NAME }}
@@ -92,6 +92,6 @@ jobs:
     - name: Upload firmware to cowtransfer
       if: steps.organize.outputs.status == 'success' && env.UPLOAD_COWTRANSFER == 'true' && !cancelled()
       run: |
-        curl -fsSL git.io/file-transfer | sh
+        curl -fsSL https://raw.githubusercontent.com/Mikubill/transfer/master/install.sh | sh
         ./transfer cow --block 2621440 -s -p 64 --no-progress ${FIRMWARE} 2>&1 | tee cowtransfer.log
         echo "::warning file=cowtransfer.com::$(cat cowtransfer.log | grep https)"
