@@ -53,11 +53,11 @@ jobs:
         CONFIG_TOOLCHAIN_DIR=${cwd//\//\\\/}\\/toolchain-mipsel
         cd trunk
         m=PSG1218_nano
-        if [ ! -f configs/templates/$m.config ] ; then
-        echo "configs/templates/$m.config not found "
+        if [ ! -f configs/templates/${m}.config ] ; then
+        echo "configs/templates/${m}.config not found "
         exit 1
         fi
-        CONFIG=configs/templates/$m.config
+        CONFIG=configs/templates/${m}.config
         echo "CONFIG_FIRMWARE_INCLUDE_IPSET=n" >> $CONFIG
         echo "CONFIG_FIRMWARE_INCLUDE_SMBD36=n" >> $CONFIG
         echo "CONFIG_FIRMWARE_INCLUDE_EAP_PEAP=n" >> $CONFIG
