@@ -54,8 +54,8 @@ jobs:
         cd trunk
         m=${{ env.DEVICE_NAME }}
         if [ ! -f configs/templates/$m.config ] ; then
-        echo "configs/templates/$m.config not found "
-        exit 1
+          echo "configs/templates/$m.config not found "
+          exit 1
         fi
         CONFIG=configs/templates/$m.config
         echo "CONFIG_FIRMWARE_INCLUDE_IPERF3=y" >> $CONFIG
