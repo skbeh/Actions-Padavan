@@ -40,7 +40,7 @@ jobs:
         git clone --depth 1 $REPO_URL -b $REPO_BRANCH rt-n56u
         cd rt-n56u/toolchain-mipsel
         ./clean_toolchain
-        ./build_toolchain
+        ./build_toolchain > /dev/null
     - name: Build Firmware
       env:
         DEVICE_NAME: PSG1218_nano
@@ -49,7 +49,7 @@ jobs:
         cwd=`pwd`
         CONFIG_TOOLCHAIN_DIR=${cwd//\//\\\/}\\/toolchain-mipsel
         cd trunk
-        m=PSG1218_nano
+        m=${{ env.DEVICE_NAME }}
         CONFIG=configs/templates/${m}.config
         echo "CONFIG_FIRMWARE_INCLUDE_IPSET=n" >> $CONFIG
         echo "CONFIG_FIRMWARE_INCLUDE_SMBD36=n" >> $CONFIG
